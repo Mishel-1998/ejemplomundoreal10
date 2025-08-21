@@ -1,0 +1,11 @@
+ID    Nombre          Cantidad   Precio    
+=============================================
+01    pera            50         $0.10      
+02    uva             15         $1.50      
+03    mango           100        $1.50      
+04    mandarina       300        $1.00      
+05    naranja         100        $1.00      
+06    piña            55         $2.00      
+07    sandia          20         $3.00      
+08    melon           15         $1.50      
+10    papaya          18         $1.00      
