@@ -1,180 +1,163 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
-from inventario import Inventario
+from tkinter import messagebox, ttk
+from PIL import Image, ImageTk
+import os
 from producto import Producto
+from inventario import Inventario
 
 
-class App:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Sistema de Gestión de Inventario")
-        self.root.geometry("850x600")
-        self.root.config(bg="#f5f6fa")
+# ----------- FUNCIONES DE INTERFAZ -----------
+def mostrar_portada():
+    portada = tk.Tk()
+    portada.title("Universidad Estatal Amazónica - Portada")
+    portada.geometry("1000x600")
+    portada.resizable(False, False)
+    portada.configure(bg="white")
 
-        # Estilo general
-        style = ttk.Style()
-        style.theme_use("clam")
-        style.configure("Treeview.Heading", font=("Segoe UI", 10, "bold"), background="#273c75", foreground="white")
-        style.configure("Treeview", font=("Segoe UI", 10), rowheight=25, background="white", fieldbackground="white")
+    # Imagen de fondo
+    try:
+        ruta = os.path.join(os.path.dirname(__file__), "Portada. UEA.png")
+        imagen = Image.open(ruta)
+        imagen = imagen.resize((900, 400))
+        fondo = ImageTk.PhotoImage(imagen)
 
-        # Encabezado
-        encabezado = tk.Frame(self.root, bg="#273c75", height=80)
-        encabezado.pack(fill="x")
-        tk.Label(encabezado, text="Sistema de Gestión de Inventario", bg="#273c75",
-                 fg="white", font=("Segoe UI", 18, "bold")).pack(pady=10)
-        tk.Label(encabezado, text="Nombre: Cinthia Carrión  |  Carrera: Ingeniería en TI  |  Paralelo: A",
-                 bg="#273c75", fg="white", font=("Segoe UI", 10)).pack()
+        fondo_label = tk.Label(portada, image=fondo, bg="white")
+        fondo_label.image = fondo
+        fondo_label.pack(pady=(40, 10))
+    except Exception as e:
+        tk.Label(portada, text=f"Error cargando imagen: {e}", fg="red", bg="white").pack(pady=20)
 
-        # Marco principal
-        contenedor = tk.Frame(self.root, bg="#f5f6fa")
-        contenedor.pack(pady=20, padx=20, fill="both", expand=True)
+    frame_botones = tk.Frame(portada, bg="white")
+    frame_botones.pack(pady=10)
 
-        # Campos de entrada
-        form = tk.LabelFrame(contenedor, text="Datos del producto", bg="#f5f6fa", font=("Segoe UI", 11, "bold"))
-        form.pack(fill="x", pady=10)
+    def abrir_sistema():
+        portada.destroy()
+        mostrar_inventario()
 
-        labels = ["ID", "Nombre", "Cantidad", "Precio"]
-        self.entries = {}
-        for i, texto in enumerate(labels):
-            tk.Label(form, text=texto + ":", bg="#f5f6fa", font=("Segoe UI", 10)).grid(row=i, column=0, padx=10, pady=5, sticky="e")
-            entry = tk.Entry(form, font=("Segoe UI", 10), width=25)
-            entry.grid(row=i, column=1, padx=5, pady=5)
-            self.entries[texto.lower()] = entry
+    btn_ingresar = tk.Button(
+        frame_botones, text="🗂  Ingresar al Sistema",
+        bg="#004aad", fg="white", font=("Segoe UI", 13, "bold"),
+        width=25, height=2, command=abrir_sistema,
+        relief="flat", cursor="hand2", activebackground="#003580"
+    )
+    btn_ingresar.pack(side="left", padx=30)
 
-        # Botones CRUD
-        botones = tk.Frame(form, bg="#f5f6fa")
-        botones.grid(row=0, column=2, rowspan=4, padx=20)
+    btn_salir = tk.Button(
+        frame_botones, text="Salir",
+        bg="#d32f2f", fg="white", font=("Segoe UI", 13, "bold"),
+        width=25, height=2, command=portada.destroy,
+        relief="flat", cursor="hand2", activebackground="#b71c1c"
+    )
+    btn_salir.pack(side="left", padx=30)
 
-        tk.Button(botones, text="Agregar", bg="#44bd32", fg="white", width=12, font=("Segoe UI", 10, "bold"),
-                  command=self.agregar_producto).pack(pady=5)
-        tk.Button(botones, text="Modificar", bg="#e1b12c", fg="white", width=12, font=("Segoe UI", 10, "bold"),
-                  command=self.modificar_producto).pack(pady=5)
-        tk.Button(botones, text="Eliminar", bg="#e84118", fg="white", width=12, font=("Segoe UI", 10, "bold"),
-                  command=self.eliminar_producto).pack(pady=5)
-        tk.Button(botones, text="Guardar", bg="#0097e6", fg="white", width=12, font=("Segoe UI", 10, "bold"),
-                  command=self.guardar_datos).pack(pady=5)
+    tk.Label(
+        portada, text="Presiona Escape para salir de la aplicación",
+        font=("Segoe UI", 10), fg="green", bg="white"
+    ).pack(side="bottom", pady=10)
 
-        # Búsqueda
-        busqueda_frame = tk.Frame(contenedor, bg="#f5f6fa")
-        busqueda_frame.pack(fill="x", pady=10)
-        tk.Label(busqueda_frame, text="Buscar:", bg="#f5f6fa", font=("Segoe UI", 10)).pack(side="left", padx=5)
-        self.buscar_var = tk.StringVar()
-        buscar_entry = tk.Entry(busqueda_frame, textvariable=self.buscar_var, width=30, font=("Segoe UI", 10))
-        buscar_entry.pack(side="left", padx=5)
-        buscar_entry.bind("<KeyRelease>", lambda e: self.actualizar_tabla())
+    portada.bind("<Escape>", lambda e: portada.destroy())
+    portada.mainloop()
 
-        # Tabla
-        tabla_frame = tk.Frame(contenedor)
-        tabla_frame.pack(fill="both", expand=True)
 
-        columnas = ("ID", "Nombre", "Cantidad", "Precio")
-        self.tree = ttk.Treeview(tabla_frame, columns=columnas, show="headings")
-        for col in columnas:
-            self.tree.heading(col, text=col)
-            self.tree.column(col, anchor="center", width=150)
-        self.tree.pack(fill="both", expand=True)
+# ----------- INTERFAZ DEL INVENTARIO -----------
+def mostrar_inventario():
+    inv = Inventario()
+    inv.cargar_desde_archivo()
 
-        # Barra de desplazamiento
-        scrollbar = ttk.Scrollbar(tabla_frame, orient="vertical", command=self.tree.yview)
-        self.tree.configure(yscroll=scrollbar.set)
-        scrollbar.pack(side="right", fill="y")
+    ventana = tk.Tk()
+    ventana.title("Sistema de Gestión de Inventario")
+    ventana.geometry("1000x600")
+    ventana.configure(bg="white")
 
-        # Contador
-        self.contador_label = tk.Label(contenedor, text="Total de productos: 0", bg="#f5f6fa", font=("Segoe UI", 10, "bold"))
-        self.contador_label.pack(pady=5)
+    tk.Label(
+        ventana, text="📦 Sistema de Gestión de Inventario",
+        font=("Segoe UI", 18, "bold"), fg="#004aad", bg="white"
+    ).pack(pady=20)
 
-        # Atajos
-        self.root.bind("<Delete>", lambda e: self.eliminar_producto())
-        self.root.bind("<Escape>", lambda e: self.root.quit())
+    # ------- CAMPOS -------
+    frame_form = tk.Frame(ventana, bg="white")
+    frame_form.pack(pady=10)
 
-        # Inventario
-        self.inventario = Inventario()
-        self.inventario.cargar_desde_archivo()
-        self.actualizar_tabla()
+    tk.Label(frame_form, text="ID:", bg="white").grid(row=0, column=0, padx=5, pady=5)
+    entry_id = tk.Entry(frame_form)
+    entry_id.grid(row=0, column=1, padx=5, pady=5)
 
-    # ---------------- FUNCIONES CRUD ----------------
-    def agregar_producto(self):
+    tk.Label(frame_form, text="Nombre:", bg="white").grid(row=1, column=0, padx=5, pady=5)
+    entry_nombre = tk.Entry(frame_form)
+    entry_nombre.grid(row=1, column=1, padx=5, pady=5)
+
+    tk.Label(frame_form, text="Cantidad:", bg="white").grid(row=2, column=0, padx=5, pady=5)
+    entry_cantidad = tk.Entry(frame_form)
+    entry_cantidad.grid(row=2, column=1, padx=5, pady=5)
+
+    tk.Label(frame_form, text="Precio:", bg="white").grid(row=3, column=0, padx=5, pady=5)
+    entry_precio = tk.Entry(frame_form)
+    entry_precio.grid(row=3, column=1, padx=5, pady=5)
+
+    # ------- TABLA -------
+    columnas = ("ID", "Nombre", "Cantidad", "Precio")
+    tabla = ttk.Treeview(ventana, columns=columnas, show="headings", height=10)
+    for col in columnas:
+        tabla.heading(col, text=col)
+        tabla.column(col, width=150)
+    tabla.pack(pady=20)
+
+    def actualizar_tabla():
+        tabla.delete(*tabla.get_children())
+        for p in inv.listar_productos():
+            tabla.insert("", "end", values=(p.id, p.nombre, p.cantidad, p.precio))
+
+    # ------- FUNCIONES -------
+    def agregar():
         try:
-            id_p = self.entries["id"].get()
-            nombre = self.entries["nombre"].get()
-            cantidad = int(self.entries["cantidad"].get())
-            precio = float(self.entries["precio"].get())
+            id_p = entry_id.get()
+            nombre = entry_nombre.get()
+            cantidad = int(entry_cantidad.get())
+            precio = float(entry_precio.get())
 
             if not id_p or not nombre:
-                messagebox.showwarning("Advertencia", "Todos los campos son obligatorios.")
+                messagebox.showwarning("Campos vacíos", "Por favor, completa todos los campos.")
                 return
 
-            if id_p in [p.id for p in self.inventario.listar_productos()]:
-                messagebox.showerror("Error", f"Ya existe un producto con ID {id_p}.")
-                return
-
-            p = Producto(id_p, nombre, cantidad, precio)
-            self.inventario.agregar_producto(p)
-            self.inventario.guardar_en_archivo()
-            self.actualizar_tabla()
-            self.limpiar_campos()
+            producto = Producto(id_p, nombre, cantidad, precio)
+            inv.agregar_producto(producto)
+            actualizar_tabla()
+            messagebox.showinfo("Éxito", "Producto agregado correctamente.")
         except ValueError:
-            messagebox.showerror("Error", "Verifica que cantidad y precio sean numéricos.")
+            messagebox.showerror("Error", "Cantidad o precio inválido.")
 
-    def eliminar_producto(self):
-        seleccionado = self.tree.selection()
-        if seleccionado:
-            id_prod = self.tree.item(seleccionado)["values"][0]
-            nombre = self.tree.item(seleccionado)["values"][1]
-
-            confirmar = messagebox.askyesno(
-                "Confirmar eliminación",
-                f"¿Estás seguro de eliminar el producto:\n\nID: {id_prod}\nNombre: {nombre} ?"
-            )
-
-            if confirmar:
-                self.inventario.eliminar_producto(id_prod)
-                self.inventario.guardar_en_archivo()
-                self.actualizar_tabla()
-                messagebox.showinfo("Éxito", f"Producto '{nombre}' eliminado correctamente.")
-        else:
-            messagebox.showwarning("Atención", "Por favor selecciona un producto para eliminar.")
-
-    def modificar_producto(self):
-        seleccionado = self.tree.selection()
+    def eliminar():
+        seleccionado = tabla.selection()
         if not seleccionado:
-            messagebox.showinfo("Info", "Selecciona un producto para modificar.")
+            messagebox.showwarning("Selecciona un producto", "Debes seleccionar un producto para eliminar.")
             return
+        item = tabla.item(seleccionado)
+        id_producto = item["values"][0]
+        inv.eliminar_producto(id_producto)
+        actualizar_tabla()
+        messagebox.showinfo("Eliminado", "Producto eliminado correctamente.")
 
-        try:
-            id_p = self.tree.item(seleccionado)["values"][0]
-            nombre = self.entries["nombre"].get()
-            cantidad = int(self.entries["cantidad"].get())
-            precio = float(self.entries["precio"].get())
-            self.inventario.modificar_producto(id_p, nombre, cantidad, precio)
-            self.inventario.guardar_en_archivo()
-            self.actualizar_tabla()
-            self.limpiar_campos()
-        except ValueError:
-            messagebox.showerror("Error", "Cantidad y precio deben ser numéricos.")
+    def guardar():
+        inv.guardar_en_archivo()
+        messagebox.showinfo("Guardado", "Inventario guardado exitosamente.")
 
-    def guardar_datos(self):
-        self.inventario.guardar_en_archivo()
-        messagebox.showinfo("Éxito", "Datos guardados correctamente.")
+    # ------- BOTONES -------
+    frame_botones = tk.Frame(ventana, bg="white")
+    frame_botones.pack(pady=10)
 
-    def limpiar_campos(self):
-        for entry in self.entries.values():
-            entry.delete(0, tk.END)
+    tk.Button(frame_botones, text="Agregar", bg="#004aad", fg="white",
+              font=("Segoe UI", 11, "bold"), width=12, command=agregar).grid(row=0, column=0, padx=10)
+    tk.Button(frame_botones, text="Eliminar", bg="#d32f2f", fg="white",
+              font=("Segoe UI", 11, "bold"), width=12, command=eliminar).grid(row=0, column=1, padx=10)
+    tk.Button(frame_botones, text="Guardar", bg="#00796b", fg="white",
+              font=("Segoe UI", 11, "bold"), width=12, command=guardar).grid(row=0, column=2, padx=10)
+    tk.Button(frame_botones, text="Salir", bg="#9e9e9e", fg="white",
+              font=("Segoe UI", 11, "bold"), width=12, command=ventana.destroy).grid(row=0, column=3, padx=10)
 
-    def actualizar_tabla(self):
-        for row in self.tree.get_children():
-            self.tree.delete(row)
-
-        filtro = self.buscar_var.get().lower()
-        productos = [p for p in self.inventario.listar_productos() if filtro in p.nombre.lower()]
-
-        for p in productos:
-            self.tree.insert("", tk.END, values=(p.id, p.nombre, p.cantidad, f"${p.precio:.2f}"))
-
-        self.contador_label.config(text=f"Total de productos: {len(productos)}")
+    actualizar_tabla()
+    ventana.mainloop()
 
 
+# -------- EJECUCIÓN --------
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = App(root)
-    root.mainloop()
+    mostrar_portada()

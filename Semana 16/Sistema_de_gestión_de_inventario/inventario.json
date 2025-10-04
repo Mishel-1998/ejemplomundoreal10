@@ -64,5 +64,11 @@
         "nombre": "Calculadora",
         "cantidad": 30,
         "precio": 12.0
+    },
+    "012": {
+        "id": "012",
+        "nombre": "Control TCL",
+        "cantidad": 6,
+        "precio": 8.0
     }
 }
