@@ -1,0 +1,68 @@
+{
+    "001": {
+        "id": "001",
+        "nombre": "Teclado mec\u00e1nico",
+        "cantidad": 15,
+        "precio": 40.0
+    },
+    "002": {
+        "id": "002",
+        "nombre": "Mouse inal\u00e1mbrico",
+        "cantidad": 20,
+        "precio": 15.0
+    },
+    "003": {
+        "id": "003",
+        "nombre": "Monitor LED",
+        "cantidad": 10,
+        "precio": 10.0
+    },
+    "004": {
+        "id": "004",
+        "nombre": "Disco duro extremo",
+        "cantidad": 8,
+        "precio": 40.0
+    },
+    "005": {
+        "id": "005",
+        "nombre": "Memoria USB",
+        "cantidad": 40,
+        "precio": 12.5
+    },
+    "006": {
+        "id": "006",
+        "nombre": "Laptop Lenovo",
+        "cantidad": 5,
+        "precio": 640.2
+    },
+    "007": {
+        "id": "007",
+        "nombre": "Impresora Epson",
+        "cantidad": 6,
+        "precio": 150.0
+    },
+    "008": {
+        "id": "008",
+        "nombre": "Router TP",
+        "cantidad": 14,
+        "precio": 35.3
+    },
+    "009": {
+        "id": "009",
+        "nombre": "Aud\u00edfonos Bluetooth",
+        "cantidad": 20,
+        "precio": 25.8
+    },
+    "010": {
+        "id": "010",
+        "nombre": "Silla Ergon\u00f3metrica",
+        "cantidad": 19,
+        "precio": 135.5
+    },
+    "011": {
+        "id": "011",
+        "nombre": "Calculadora",
+        "cantidad": 30,
+        "precio": 12.0
+    }
+}

@@ -131,7 +131,7 @@ class App:
                 self.inventario.eliminar_producto(id_prod)
                 self.inventario.guardar_en_archivo()
                 self.actualizar_tabla()
-                messagebox.showinfo("Éxito", f"✅ Producto '{nombre}' eliminado correctamente.")
+                messagebox.showinfo("Éxito", f"Producto '{nombre}' eliminado correctamente.")
         else:
             messagebox.showwarning("Atención", "Por favor selecciona un producto para eliminar.")
 
