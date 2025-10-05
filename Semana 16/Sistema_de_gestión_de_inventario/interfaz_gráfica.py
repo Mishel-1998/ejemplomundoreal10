@@ -5,8 +5,8 @@ import os
 from producto import Producto
 from inventario import Inventario
 
-
 # ----------- FUNCIONES DE INTERFAZ -----------
+
 def mostrar_portada():
     portada = tk.Tk()
     portada.title("Universidad Estatal Amazónica - Portada")
@@ -25,8 +25,9 @@ def mostrar_portada():
         fondo_label.image = fondo
         fondo_label.pack(pady=(40, 10))
     except Exception as e:
-        tk.Label(portada, text=f"Error cargando imagen: {e}", fg="red", bg="white").pack(pady=20)
+        tk.Label(portada, text=f"⚠️ Error cargando imagen: {e}", fg="red", bg="white").pack(pady=20)
 
+    # Botones debajo de la imagen
     frame_botones = tk.Frame(portada, bg="white")
     frame_botones.pack(pady=10)
 
@@ -43,29 +44,23 @@ def mostrar_portada():
     btn_ingresar.pack(side="left", padx=30)
 
     btn_salir = tk.Button(
-        frame_botones, text="Salir",
+        frame_botones, text="❌ Salir",
         bg="#d32f2f", fg="white", font=("Segoe UI", 13, "bold"),
         width=25, height=2, command=portada.destroy,
         relief="flat", cursor="hand2", activebackground="#b71c1c"
     )
     btn_salir.pack(side="left", padx=30)
 
-    tk.Label(
-        portada, text="Presiona Escape para salir de la aplicación",
-        font=("Segoe UI", 10), fg="green", bg="white"
-    ).pack(side="bottom", pady=10)
-
     portada.bind("<Escape>", lambda e: portada.destroy())
     portada.mainloop()
 
 
-# ----------- INTERFAZ DEL INVENTARIO -----------
 def mostrar_inventario():
     inv = Inventario()
     inv.cargar_desde_archivo()
 
     ventana = tk.Tk()
-    ventana.title("Sistema de Gestión de Inventario")
+    ventana.title("📦 Sistema de Gestión de Inventario")
     ventana.geometry("1000x600")
     ventana.configure(bg="white")
 
@@ -74,7 +69,7 @@ def mostrar_inventario():
         font=("Segoe UI", 18, "bold"), fg="#004aad", bg="white"
     ).pack(pady=20)
 
-    # ------- CAMPOS -------
+    # ------- FORMULARIO -------
     frame_form = tk.Frame(ventana, bg="white")
     frame_form.pack(pady=10)
 
@@ -102,12 +97,35 @@ def mostrar_inventario():
         tabla.column(col, width=150)
     tabla.pack(pady=20)
 
+    # ------- FUNCIONES -------
+    def limpiar_campos():
+        entry_id.delete(0, tk.END)
+        entry_nombre.delete(0, tk.END)
+        entry_cantidad.delete(0, tk.END)
+        entry_precio.delete(0, tk.END)
+
     def actualizar_tabla():
         tabla.delete(*tabla.get_children())
         for p in inv.listar_productos():
-            tabla.insert("", "end", values=(p.id, p.nombre, p.cantidad, p.precio))
+            tabla.insert("", "end", values=(p.get_id(), p.get_nombre(), p.get_cantidad(), p.get_precio()))
 
-    # ------- FUNCIONES -------
+    def seleccionar_producto(event):
+        try:
+            item = tabla.selection()[0]
+            valores = tabla.item(item, "values")
+            entry_id.delete(0, tk.END)
+            entry_nombre.delete(0, tk.END)
+            entry_cantidad.delete(0, tk.END)
+            entry_precio.delete(0, tk.END)
+            entry_id.insert(0, valores[0])
+            entry_nombre.insert(0, valores[1])
+            entry_cantidad.insert(0, valores[2])
+            entry_precio.insert(0, valores[3])
+        except IndexError:
+            pass
+
+    tabla.bind("<<TreeviewSelect>>", seleccionar_producto)
+
     def agregar():
         try:
             id_p = entry_id.get()
@@ -116,43 +134,113 @@ def mostrar_inventario():
             precio = float(entry_precio.get())
 
             if not id_p or not nombre:
-                messagebox.showwarning("Campos vacíos", "Por favor, completa todos los campos.")
+                messagebox.showwarning("Advertencia", "Por favor completa todos los campos.")
+                return
+
+            if any(p.get_id() == id_p for p in inv.listar_productos()):
+                messagebox.showerror("Duplicado", f"Ya existe un producto con ID {id_p}.")
                 return
 
             producto = Producto(id_p, nombre, cantidad, precio)
             inv.agregar_producto(producto)
             actualizar_tabla()
-            messagebox.showinfo("Éxito", "Producto agregado correctamente.")
+            limpiar_campos()
         except ValueError:
-            messagebox.showerror("Error", "Cantidad o precio inválido.")
+            messagebox.showerror("Error", "La cantidad o el precio deben ser numéricos.")
+
+    def modificar():
+        seleccionado = tabla.selection()
+        if not seleccionado:
+            messagebox.showwarning("Advertencia", "Selecciona un producto para modificar.")
+            return
+        try:
+            id_p = entry_id.get()
+            nombre = entry_nombre.get()
+            cantidad = int(entry_cantidad.get())
+            precio = float(entry_precio.get())
+            exito = inv.modificar_producto(id_p, nombre, cantidad, precio)
+            if exito:
+                actualizar_tabla()
+                limpiar_campos()
+            else:
+                messagebox.showerror("Error", f"No se pudo modificar. Verifica que el ID '{id_p}' exista.")
+        except ValueError:
+            messagebox.showerror("Error", "Verifica que los valores sean correctos.")
 
     def eliminar():
         seleccionado = tabla.selection()
         if not seleccionado:
-            messagebox.showwarning("Selecciona un producto", "Debes seleccionar un producto para eliminar.")
+            messagebox.showwarning("Advertencia", "Selecciona un producto para eliminar.")
             return
-        item = tabla.item(seleccionado)
-        id_producto = item["values"][0]
-        inv.eliminar_producto(id_producto)
-        actualizar_tabla()
-        messagebox.showinfo("Eliminado", "Producto eliminado correctamente.")
+        item = tabla.item(seleccionado[0])
+        id_producto = str(item["values"][0]).zfill(3)
+        confirmar = messagebox.askyesno("Confirmar eliminación", f"¿Eliminar el producto con ID {id_producto}?")
+        if confirmar:
+            exito = inv.eliminar_producto(id_producto)
+            if exito:
+                actualizar_tabla()
+                limpiar_campos()
+            else:
+                messagebox.showerror("Error", f"No se pudo eliminar el producto. Revisa que el ID '{id_producto}' exista.")
+
+    def buscar_por_id():
+        pid = entry_id.get().strip()
+        if not pid:
+            messagebox.showwarning("Advertencia", "Ingresa un ID para buscar.")
+            return
+        encontrado = None
+        for p in inv.listar_productos():
+            if p.get_id() == pid:
+                encontrado = p
+                break
+        if encontrado:
+            entry_nombre.delete(0, tk.END)
+            entry_cantidad.delete(0, tk.END)
+            entry_precio.delete(0, tk.END)
+
+            entry_nombre.insert(0, encontrado.get_nombre())
+            entry_cantidad.insert(0, str(encontrado.get_cantidad()))
+            entry_precio.insert(0, str(encontrado.get_precio()))
+            messagebox.showinfo("Producto encontrado", f"Producto con ID {pid} cargado en el formulario.")
+        else:
+            messagebox.showerror("No encontrado", f"No existe ningún producto con ID {pid}.")
 
     def guardar():
         inv.guardar_en_archivo()
         messagebox.showinfo("Guardado", "Inventario guardado exitosamente.")
 
+    def salir():
+        guardar()
+        ventana.destroy()
+
     # ------- BOTONES -------
     frame_botones = tk.Frame(ventana, bg="white")
     frame_botones.pack(pady=10)
 
-    tk.Button(frame_botones, text="Agregar", bg="#004aad", fg="white",
-              font=("Segoe UI", 11, "bold"), width=12, command=agregar).grid(row=0, column=0, padx=10)
-    tk.Button(frame_botones, text="Eliminar", bg="#d32f2f", fg="white",
-              font=("Segoe UI", 11, "bold"), width=12, command=eliminar).grid(row=0, column=1, padx=10)
-    tk.Button(frame_botones, text="Guardar", bg="#00796b", fg="white",
-              font=("Segoe UI", 11, "bold"), width=12, command=guardar).grid(row=0, column=2, padx=10)
-    tk.Button(frame_botones, text="Salir", bg="#9e9e9e", fg="white",
-              font=("Segoe UI", 11, "bold"), width=12, command=ventana.destroy).grid(row=0, column=3, padx=10)
+    # Botones principales
+    botones = [
+        ("Agregar", "#004aad", agregar),
+        ("Modificar", "#ff9800", modificar),
+        ("Eliminar", "#d32f2f", eliminar),
+        ("Guardar", "#00796b", guardar),
+        ("Salir", "#9e9e9e", salir)
+    ]
+
+    for i, (texto, color, accion) in enumerate(botones):
+        tk.Button(
+            frame_botones, text=texto, bg=color, fg="white",
+            font=("Segoe UI", 11, "bold"), width=12, command=accion,
+            relief="flat", cursor="hand2"
+        ).grid(row=0, column=i, padx=10)
+
+    # Botones pequeños adicionales
+    tk.Button(frame_form, text="Limpiar campos", bg="#9e9e9e", fg="white",
+              font=("Segoe UI", 10, "bold"), command=limpiar_campos,
+              relief="flat", cursor="hand2").grid(row=0, column=2, rowspan=2, padx=10)
+
+    tk.Button(frame_form, text="Buscar por ID", bg="#2196f3", fg="white",
+              font=("Segoe UI", 10, "bold"), command=buscar_por_id,
+              relief="flat", cursor="hand2").grid(row=0, column=3, rowspan=2, padx=10)
 
     actualizar_tabla()
     ventana.mainloop()

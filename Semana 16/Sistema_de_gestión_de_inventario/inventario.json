@@ -1,74 +1,74 @@
-{
-    "001": {
-        "id": "001",
-        "nombre": "Teclado mec\u00e1nico",
-        "cantidad": 15,
-        "precio": 40.0
+[
+    {
+        "_id": "001",
+        "_nombre": "Teclado mec\u00e1nico",
+        "_cantidad": 15,
+        "_precio": 40.0
     },
-    "002": {
-        "id": "002",
-        "nombre": "Mouse inal\u00e1mbrico",
-        "cantidad": 20,
-        "precio": 15.0
+    {
+        "_id": "002",
+        "_nombre": "Mouse inal\u00e1mbrico",
+        "_cantidad": 20,
+        "_precio": 15.0
     },
-    "003": {
-        "id": "003",
-        "nombre": "Monitor LED",
-        "cantidad": 10,
-        "precio": 10.0
+    {
+        "_id": "003",
+        "_nombre": "Monitor LED",
+        "_cantidad": 10,
+        "_precio": 10.0
     },
-    "004": {
-        "id": "004",
-        "nombre": "Disco duro extremo",
-        "cantidad": 8,
-        "precio": 40.0
+    {
+        "_id": "004",
+        "_nombre": "Disco duro extremo",
+        "_cantidad": 8,
+        "_precio": 40.0
     },
-    "005": {
-        "id": "005",
-        "nombre": "Memoria USB",
-        "cantidad": 40,
-        "precio": 12.5
+    {
+        "_id": "005",
+        "_nombre": "Memoria USB",
+        "_cantidad": 40,
+        "_precio": 12.5
     },
-    "006": {
-        "id": "006",
-        "nombre": "Laptop Lenovo",
-        "cantidad": 5,
-        "precio": 640.2
+    {
+        "_id": "006",
+        "_nombre": "Laptop Lenovo",
+        "_cantidad": 5,
+        "_precio": 640.2
     },
-    "007": {
-        "id": "007",
-        "nombre": "Impresora Epson",
-        "cantidad": 6,
-        "precio": 150.0
+    {
+        "_id": "007",
+        "_nombre": "Impresora Epson",
+        "_cantidad": 6,
+        "_precio": 180.0
     },
-    "008": {
-        "id": "008",
-        "nombre": "Router TP",
-        "cantidad": 14,
-        "precio": 35.3
+    {
+        "_id": "008",
+        "_nombre": "Router TP",
+        "_cantidad": 14,
+        "_precio": 35.5
     },
-    "009": {
-        "id": "009",
-        "nombre": "Aud\u00edfonos Bluetooth",
-        "cantidad": 20,
-        "precio": 25.8
+    {
+        "_id": "009",
+        "_nombre": "Aud\u00edfonos Bluetooth",
+        "_cantidad": 20,
+        "_precio": 25.0
     },
-    "010": {
-        "id": "010",
-        "nombre": "Silla Ergon\u00f3metrica",
-        "cantidad": 19,
-        "precio": 135.5
+    {
+        "_id": "010",
+        "_nombre": "Silla Ergon\u00f3metrica",
+        "_cantidad": 19,
+        "_precio": 135.8
     },
-    "011": {
-        "id": "011",
-        "nombre": "Calculadora",
-        "cantidad": 30,
-        "precio": 12.0
+    {
+        "_id": "012",
+        "_nombre": "Control TCL",
+        "_cantidad": 30,
+        "_precio": 8.0
     },
-    "012": {
-        "id": "012",
-        "nombre": "Control TCL",
-        "cantidad": 6,
-        "precio": 8.0
+    {
+        "_id": "014",
+        "_nombre": "Celular Xiaomi",
+        "_cantidad": 80,
+        "_precio": 200.0
     }
-}
+]
