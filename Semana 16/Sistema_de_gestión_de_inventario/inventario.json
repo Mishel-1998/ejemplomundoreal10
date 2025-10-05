@@ -70,5 +70,17 @@
         "_nombre": "Celular Xiaomi",
         "_cantidad": 80,
         "_precio": 200.0
+    },
+    {
+        "_id": "015",
+        "_nombre": "Tablet Samsung",
+        "_cantidad": 5,
+        "_precio": 500.0
+    },
+    {
+        "_id": "016",
+        "_nombre": "Altavoz prime",
+        "_cantidad": 9,
+        "_precio": 55.4
     }
 ]

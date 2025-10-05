@@ -128,8 +128,8 @@ def mostrar_inventario():
 
     def agregar():
         try:
-            id_p = entry_id.get()
-            nombre = entry_nombre.get()
+            id_p = entry_id.get().strip()
+            nombre = entry_nombre.get().strip()
             cantidad = int(entry_cantidad.get())
             precio = float(entry_precio.get())
 
@@ -145,6 +145,7 @@ def mostrar_inventario():
             inv.agregar_producto(producto)
             actualizar_tabla()
             limpiar_campos()
+            messagebox.showinfo("Éxito", f"Producto '{nombre}' con ID {id_p} agregado correctamente.")
         except ValueError:
             messagebox.showerror("Error", "La cantidad o el precio deben ser numéricos.")
 
@@ -154,14 +155,15 @@ def mostrar_inventario():
             messagebox.showwarning("Advertencia", "Selecciona un producto para modificar.")
             return
         try:
-            id_p = entry_id.get()
-            nombre = entry_nombre.get()
+            id_p = entry_id.get().strip()
+            nombre = entry_nombre.get().strip()
             cantidad = int(entry_cantidad.get())
             precio = float(entry_precio.get())
             exito = inv.modificar_producto(id_p, nombre, cantidad, precio)
             if exito:
                 actualizar_tabla()
                 limpiar_campos()
+                messagebox.showinfo("Éxito", f"Producto '{nombre}' con ID {id_p} modificado correctamente.")
             else:
                 messagebox.showerror("Error", f"No se pudo modificar. Verifica que el ID '{id_p}' exista.")
         except ValueError:
@@ -180,6 +182,7 @@ def mostrar_inventario():
             if exito:
                 actualizar_tabla()
                 limpiar_campos()
+                messagebox.showinfo("Eliminado", f"Producto con ID {id_producto} eliminado correctamente.")
             else:
                 messagebox.showerror("Error", f"No se pudo eliminar el producto. Revisa que el ID '{id_producto}' exista.")
 
@@ -197,7 +200,6 @@ def mostrar_inventario():
             entry_nombre.delete(0, tk.END)
             entry_cantidad.delete(0, tk.END)
             entry_precio.delete(0, tk.END)
-
             entry_nombre.insert(0, encontrado.get_nombre())
             entry_cantidad.insert(0, str(encontrado.get_cantidad()))
             entry_precio.insert(0, str(encontrado.get_precio()))
